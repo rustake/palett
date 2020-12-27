@@ -1,0 +1,9 @@
+pub const BLACK: &str = "30";
+pub const RED: &str = "31";
+pub const GREEN: &str = "32";
+pub const YELLOW: &str = "33";
+pub const BLUE: &str = "34";
+pub const MAGENTA: &str = "35";
+pub const CYAN: &str = "36";
+pub const WHITE: &str = "37";
+pub const GREY: &str = "90";
