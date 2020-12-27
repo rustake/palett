@@ -2,6 +2,8 @@
 name = "palett"
 version = "0.0.1"
 authors = ["hazen <hoyeungw@outlook.com>"]
+description = "ansi color space tool"
+license = "MIT"
 edition = "2018"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
