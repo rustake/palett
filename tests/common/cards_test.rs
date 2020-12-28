@@ -8,7 +8,7 @@ mod cards_test {
 
     #[test]
     fn test() {
-        let dye_factory = DyeFactory::hex(&[Effect::Bold]);
+        let dye_factory = DyeFactory::hex(&[Effect::Bold, Effect::Underline]);
         AMBER.to_hashmap().iterate(|k, v| {
             println!("{}: {}", k, dye_factory.render(v, v));
         });
