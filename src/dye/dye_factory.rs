@@ -11,61 +11,29 @@ pub struct DyeFactory<T>
     ansi: fn(T) -> String,
 }
 
-// fn create_dye_factory(color_space: &ColorSpace, effects: &[Effect]) -> DyeFactory {
-//     let ansi_fn = match color_space {
-//         ColorSpace::RGB => { rgb_ansi }
-//         ColorSpace::HSL => { hsl_ansi }
-//         ColorSpace::HEX => { hex_ansi }
-//     };
-//     let mut dye = DyeFactory {
-//         head: "".to_owned(),
-//         tail: "".to_owned(),
-//         ansi: ansi_fn,
-//     };
-//     (&mut dye).assign_effects(effects);
-//     return dye;
-// }
+fn build_dye_factory<T>(color_to_ansi: fn(T) -> String, effects: &[Effect]) -> DyeFactory<T> {
+    let mut dye = DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi: color_to_ansi };
+    (&mut dye).assign_effects(effects);
+    return dye;
+}
 
 impl DyeFactory<&RGB> {
-    pub fn rgb(effects: &[Effect]) -> DyeFactory<&RGB> {
-        let mut dye_factory = DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi: rgb_ansi };
-        (&mut dye_factory).assign_effects(effects);
-        dye_factory
+    pub fn rgb(effects: &[Effect]) -> Self {
+        build_dye_factory(rgb_ansi, effects)
     }
 }
 
 impl DyeFactory<&HSL> {
-    pub fn hsl(effects: &[Effect]) -> DyeFactory<&HSL> {
-        let mut dye_factory = DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi: hsl_ansi };
-        (&mut dye_factory).assign_effects(effects);
-        dye_factory
+    pub fn hsl(effects: &[Effect]) -> Self {
+        build_dye_factory(hsl_ansi, effects)
     }
 }
 
 impl DyeFactory<&HEX> {
-    pub fn hex(effects: &[Effect]) -> DyeFactory<&HEX> {
-        let mut dye_factory = DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi: hex_ansi };
-        (&mut dye_factory).assign_effects(effects);
-        dye_factory
+    pub fn hex(effects: &[Effect]) -> Self {
+        build_dye_factory(hex_ansi, effects)
     }
 }
-
-// trait DyeFactoryInitializer {
-//     type ColorType;
-//     fn new(color_type: ColorSpace) -> DyeFactory<Self::ColorType>;
-// }
-//
-// impl<T> DyeFactoryInitializer for DyeFactory<T> {
-//     type ColorType = T;
-//     fn new(color_type: ColorSpace) -> DyeFactory<Self::ColorType> {
-//         let ansi = match color_type {
-//             ColorSpace::RGB => { rgb_ansi }
-//             ColorSpace::HSL => { hsl_ansi }
-//             ColorSpace::HEX => { hex_ansi }
-//         };
-//         return DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi };
-//     }
-// }
 
 impl<T> DyeFactory<T>
 {
@@ -78,35 +46,38 @@ impl<T> DyeFactory<T>
         self
     }
 
+    pub fn make(&self, color: T) -> impl Fn(&str) -> String + '_ {
+        let ansi = (self.ansi)(color);
+        let head = format!("{}{}{}{}{}", L, &self.head, SC, &ansi, R);
+        let tail = format!("{}{}{}", L, &self.tail, R);
+        move |text| format!("{}{}{}", head, text, tail)
+    }
+
     // pub fn fission(&self, rgb: &RGB) -> Box<dyn Fn(&str) -> String + '_> {
     //     let ansi = rgb_ansi(rgb);
     //     Box::new(move |text| format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text, L, &self.tail, R))
     // }
-
-    pub fn project(&self, color: T) -> impl Fn(&str) -> String + '_ {
-        let ansi = (self.ansi)(color);
-        move |text| format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text, L, &self.tail, R)
-    }
 }
 
-// impl Fn<(&RGB, )> for DyeFactory {
-//     extern "rust-call" fn call(&self, args: (&RGB, )) -> impl Fn(&str) -> String + '_ {
-//         let ansi = rgb_ansi(args.0);
+// impl<T> Fn<(T, )> for DyeFactory<T> {
+//     extern "rust-call" fn call(&self, args: (T, )) -> fn(&str) -> String {
+//         let ansi = (self.ansi)(args.0);
 //         move |text| format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text, L, &self.tail, R)
 //     }
 // }
 //
-// impl FnMut<(&RGB, )> for DyeFactory {
-//     extern "rust-call" fn call_mut(&mut self, args: (&RGB, )) -> impl Fn(&str) -> String + '_ {
+// impl<T> FnMut<(T, )> for DyeFactory<T> {
+//     extern "rust-call" fn call_mut(&mut self, args: (T, )) -> fn(&str) -> String {
 //         self.call(args)
 //     }
 // }
 //
-// impl FnOnce<(&RGB, )> for DyeFactory {
+// impl<T> FnOnce<(T, )> for DyeFactory<T> {
 //     type Output = String;
-//     extern "rust-call" fn call_once(self, args: (&RGB, )) -> impl Fn(&str) -> String + '_ {
+//     extern "rust-call" fn call_once(self, args: (T, )) -> fn(&str) -> String {
 //         self.call(args)
 //     }
+//     // impl Fn(&str) -> String + '_
 // }
 
 #[cfg(test)]
@@ -118,26 +89,26 @@ mod tests {
     #[test]
     fn test_rgb() {
         let dye_factory = DyeFactory::rgb(&[Effect::Bold]);
-        let dye = dye_factory.project(&(255, 0, 0));
-        let text = dye("abc");
+        let dye = dye_factory.make(&(255, 0, 0));
+        let text = dye("shakes - rgb");
         println!("{}", text);
     }
 
     #[test]
     fn test_hex() {
         let dye_factory = DyeFactory::hex(&[Effect::Bold]);
-        let dye = dye_factory.project("#00FF00");
-        let text = dye("abc");
+        let dye = dye_factory.make("#00FF00");
+        let text = dye("shakes - hex");
         println!("{}", text);
     }
 
-    // #[test]
-    // fn test_beta() {
-    //     let dye_factory = DyeFactory::new(ColorSpace::RGB);
-    //     let func = dye_factory.init(&(255, 0, 0));
-    //     let text = func("abc");
-    //     println!("{}", text);
-    // }
+    #[test]
+    fn test_hsl() {
+        let dye_factory = DyeFactory::hsl(&[Effect::Bold]);
+        let dye = dye_factory.make(&(240, 120, 84));
+        let text = dye("shakes - hex");
+        println!("{}", text);
+    }
 }
 
 

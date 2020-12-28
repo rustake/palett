@@ -3,6 +3,7 @@ name = "palett"
 version = "0.0.1"
 authors = ["hazen <hoyeungw@outlook.com>"]
 description = "ansi color space tool"
+readme = "README.md"
 license = "MIT"
 edition = "2018"
 
