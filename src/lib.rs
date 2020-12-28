@@ -6,6 +6,7 @@ pub mod dye;
 pub mod enums;
 pub mod utils;
 pub mod types;
+pub mod cards;
 
 #[cfg(test)]
 mod tests {

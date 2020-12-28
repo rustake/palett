@@ -29,12 +29,12 @@ mod tests {
         // let mut book_reviews = HashMap::new();
         let mut map = HashMap::new();
         map.insert("black", (0u16, 0u8, 0u8));
-        map.insert("red", (0u16, 100u8, 50u8));
-        map.insert("green", (120u16, 90u8, 50u8));
-        map.insert("blue", (240u16, 100u8, 50u8));
-        map.insert("yellow", (60u16, 100u8, 50u8));
+        map.insert("RED", (0u16, 100u8, 50u8));
+        map.insert("GREEN", (120u16, 90u8, 50u8));
+        map.insert("BLUE", (240u16, 100u8, 50u8));
+        map.insert("YELLOW", (60u16, 100u8, 50u8));
         map.insert("magenta", (300u16, 100u8, 50u8));
-        map.insert("cyan", (180u16, 100u8, 50u8));
+        map.insert("CYAN", (180u16, 100u8, 50u8));
         map.insert("white", (0u16, 0u8, 100u8));
 
         // println!("{:?}", map);

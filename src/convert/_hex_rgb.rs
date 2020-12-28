@@ -16,12 +16,12 @@ mod tests {
         // let mut book_reviews = HashMap::new();
         let mut map = HashMap::new();
         map.insert("black", "#000000");
-        map.insert("red", "#FF0000");
-        map.insert("green", "#00FF00");
-        map.insert("blue", "#0000FF");
-        map.insert("yellow", "#FFFF00");
+        map.insert("RED", "#FF0000");
+        map.insert("GREEN", "#00FF00");
+        map.insert("BLUE", "#0000FF");
+        map.insert("YELLOW", "#FFFF00");
         map.insert("magenta", "#FF00FF");
-        map.insert("cyan", "#00FFFF");
+        map.insert("CYAN", "#00FFFF");
         map.insert("white", "#FFFFFF");
         // println!("{:?}", map);
         for (key, value) in map {
