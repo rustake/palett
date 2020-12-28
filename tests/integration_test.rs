@@ -2,3 +2,4 @@
 #![feature(fn_traits)]
 
 mod alpha;
+mod common;

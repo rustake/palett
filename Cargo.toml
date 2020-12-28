@@ -12,4 +12,4 @@ edition = "2018"
 [dependencies]
 num-traits = "0.2"
 num = "0.3.1"
-veho = ">=0.0.3"
+veho = ">=0.0.5"

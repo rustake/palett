@@ -1,8 +1,9 @@
 use std::fmt::Write;
-use crate::utils::ansi::{effect_to_ansi, SC, L, R};
-use crate::enums::{Effect};
-use crate::dye::color_to_ansi::{rgb_ansi, hex_ansi, hsl_ansi};
-use crate::types::{RGB, HSL, HEX};
+
+use crate::dye::color_to_ansi::{hex_ansi, hsl_ansi, rgb_ansi};
+use crate::enums::Effect;
+use crate::types::{HEX, HSL, RGB};
+use crate::utils::ansi::{effect_to_ansi, L, R, SC};
 
 pub struct DyeFactory<T>
 {
@@ -53,6 +54,11 @@ impl<T> DyeFactory<T>
         move |text| format!("{}{}{}", head, text, tail)
     }
 
+    pub fn render(&self, color: T, text: &str) -> String {
+        let ansi = (self.ansi)(color);
+        format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text,  L, &self.tail, R)
+    }
+
     // pub fn fission(&self, rgb: &RGB) -> Box<dyn Fn(&str) -> String + '_> {
     //     let ansi = rgb_ansi(rgb);
     //     Box::new(move |text| format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text, L, &self.tail, R))
@@ -82,9 +88,10 @@ impl<T> DyeFactory<T>
 
 #[cfg(test)]
 mod tests {
-    use crate::enums::{Effect};
     use crate::dye::DyeFactory;
-    // use crate::dye::dye_factory::DyeFactoryInitializer;
+    use crate::enums::Effect;
+
+// use crate::dye::dye_factory::DyeFactoryInitializer;
 
     #[test]
     fn test_rgb() {
