@@ -2,7 +2,7 @@
 
 [![crate](https://img.shields.io/crates/v/palett.svg)](https://crates.io/crates/palett)
 [![documentation](https://docs.rs/palett/badge.svg)](https://docs.rs/palett)
-[![minimum rustc 1.8](https://img.shields.io/badge/rustc-1.8+-red.svg)](https://rust-lang.github.io/rfcs/2495-min-rust-version.html)
+[![minimum rustc 1.48](https://img.shields.io/badge/rustc-1.48+-red.svg)](https://rust-lang.github.io/rfcs/2495-min-rust-version.html)
 [![build status](https://github.com/rust-num/palett/workflows/master/badge.svg)](https://github.com/rust-num/palett/actions)
 
 Ansi color tool for Rust
