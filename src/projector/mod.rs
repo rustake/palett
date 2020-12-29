@@ -1,2 +1,5 @@
-pub mod utils;
-pub mod projector;
+pub use projector::ProjectorFactory;
+
+mod utils;
+mod projector;
+

@@ -1,10 +1,10 @@
-use crate::types::{ColorBound, HSL, RGB};
+use crate::types::{ColorBound, div, HSL, RGB};
 
 const THOUSAND: f32 = 1000.0;
 
 pub fn rgb_hsl(rgb: &RGB) -> HSL {
     let (r, g, b) = *rgb;
-    let (r, g, b) = ((r as f32) / 255.0, (g as f32) / 255.0, (b as f32) / 255.0);
+    let (r, g, b) = div(&(r as f32, g as f32, b as f32), 255.0);
     let ColorBound { max, sum, dif } = ColorBound::from(&(r, g, b));
     let h = hue(r, g, b, max, dif) * 60.0;
     let s = if dif == 0.0 { 0.0 } else { dif / (2.0 - sum) };
