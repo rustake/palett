@@ -5,38 +5,38 @@ use crate::enums::Effect;
 use crate::types::{HEX, HSL, RGB};
 use crate::utils::ansi::{effect_to_ansi, L, R, SC};
 
-pub struct DyeFactory<T>
+pub struct DyeFactory<T: ?Sized>
 {
     head: String,
     tail: String,
-    ansi: fn(T) -> String,
+    ansi: fn(&T) -> String,
 }
 
-fn build_dye_factory<T>(color_to_ansi: fn(T) -> String, effects: &[Effect]) -> DyeFactory<T> {
+fn build_dye_factory<T: ?Sized>(color_to_ansi: fn(&T) -> String, effects: &[Effect]) -> DyeFactory<T> {
     let mut dye = DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi: color_to_ansi };
     (&mut dye).assign_effects(effects);
     return dye;
 }
 
-impl DyeFactory<&RGB> {
+impl DyeFactory<RGB> {
     pub fn rgb(effects: &[Effect]) -> Self {
         build_dye_factory(rgb_ansi, effects)
     }
 }
 
-impl DyeFactory<&HSL> {
+impl DyeFactory<HSL> {
     pub fn hsl(effects: &[Effect]) -> Self {
         build_dye_factory(hsl_ansi, effects)
     }
 }
 
-impl DyeFactory<&HEX> {
+impl DyeFactory<HEX> {
     pub fn hex(effects: &[Effect]) -> Self {
         build_dye_factory(hex_ansi, effects)
     }
 }
 
-impl<T> DyeFactory<T>
+impl<T: ?Sized> DyeFactory<T>
 {
     pub fn assign_effects(&mut self, effects: &[Effect]) -> &Self {
         for effect in effects {
@@ -47,16 +47,16 @@ impl<T> DyeFactory<T>
         self
     }
 
-    pub fn make(&self, color: T) -> impl Fn(&str) -> String + '_ {
+    pub fn make(&self, color: &T) -> impl Fn(&str) -> String + '_ {
         let ansi = (self.ansi)(color);
         let head = format!("{}{}{}{}{}", L, &self.head, SC, &ansi, R);
         let tail = format!("{}{}{}", L, &self.tail, R);
         move |text| format!("{}{}{}", head, text, tail)
     }
 
-    pub fn render(&self, color: T, text: &str) -> String {
+    pub fn render(&self, color: &T, text: &str) -> String {
         let ansi = (self.ansi)(color);
-        format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text,  L, &self.tail, R)
+        format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text, L, &self.tail, R)
     }
 
     // pub fn fission(&self, rgb: &RGB) -> Box<dyn Fn(&str) -> String + '_> {
@@ -112,7 +112,7 @@ mod tests {
     #[test]
     fn test_hsl() {
         let dye_factory = DyeFactory::hsl(&[Effect::Bold]);
-        let dye = dye_factory.make(&(240, 120, 84));
+        let dye = dye_factory.make(&(240.0, 120.0, 84.0));
         let text = dye("shakes - hex");
         println!("{}", text);
     }

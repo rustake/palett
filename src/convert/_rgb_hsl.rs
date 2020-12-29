@@ -1,41 +1,19 @@
-use num_traits::{Num};
-use crate::types::{RGB, HSL};
+use crate::types::{ColorBound, HSL, RGB};
 
 const THOUSAND: f32 = 1000.0;
 
 pub fn rgb_hsl(rgb: &RGB) -> HSL {
-    let (r, g, b) = rgb;
-    let (r, g, b) = (
-        f32::from(*r) / 255.0,
-        f32::from(*g) / 255.0,
-        f32::from(*b) / 255.0
-    );
-    let Bound { max, sum, dif } = bound((r, g, b));
+    let (r, g, b) = *rgb;
+    let (r, g, b) = ((r as f32) / 255.0, (g as f32) / 255.0, (b as f32) / 255.0);
+    let ColorBound { max, sum, dif } = ColorBound::from(&(r, g, b));
     let h = hue(r, g, b, max, dif) * 60.0;
     let s = if dif == 0.0 { 0.0 } else { dif / (2.0 - sum) };
     let l = sum / 2.0;
     let s = s * THOUSAND / 10.0;
     let l = l * THOUSAND / 10.0;
-    return (h as u16, s as u8, l as u8);
+    return (h, s, l);
 }
 
-pub struct Bound<T> {
-    max: T,
-    sum: T,
-    dif: T,
-}
-
-pub fn bound<T: Num + PartialOrd + Copy>(rgb: (T, T, T)) -> Bound<T> {
-    let (r, g, b) = rgb;
-    let mut va = r;
-    let mut vi = r;
-    if g > r { va = g } else { vi = g }
-    if b > va { va = b }
-    if b < vi { vi = b }
-    let sum = va + vi;
-    let dif = va - vi;
-    return Bound { max: va, sum, dif };
-}
 
 pub fn hue(r: f32, g: f32, b: f32, max: f32, dif: f32) -> f32 {
     if dif == 0.0 { return 0.0; }
@@ -50,6 +28,7 @@ pub fn hue(r: f32, g: f32, b: f32, max: f32, dif: f32) -> f32 {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+
     use crate::convert::_rgb_hsl::rgb_hsl;
 
     #[test]

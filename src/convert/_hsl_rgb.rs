@@ -7,9 +7,9 @@ fn hf(n: f32, h: f32, a: f32, l: f32) -> f32 {
 
 pub fn hsl_rgb(hsl: &HSL) -> RGB {
     let (h, s, l) = hsl;
-    let h = *h as f32;
-    let s = (*s as f32) / 100.0;
-    let l = (*l as f32) / 100.0;
+    let h = *h;
+    let s = *s / 100.0;
+    let l = *l / 100.0;
     // println!("h = {}, s = {}, l = {}", h, s, l);
     let a = s * f32::min(l, 1.0 - l);
     let r = hf(0.0, h, a, l);
@@ -22,20 +22,21 @@ pub fn hsl_rgb(hsl: &HSL) -> RGB {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+
     use crate::convert::_hsl_rgb::hsl_rgb;
 
     #[test]
     fn test_hsl_to_rgb() {
         // let mut book_reviews = HashMap::new();
         let mut map = HashMap::new();
-        map.insert("black", (0u16, 0u8, 0u8));
-        map.insert("RED", (0u16, 100u8, 50u8));
-        map.insert("GREEN", (120u16, 90u8, 50u8));
-        map.insert("BLUE", (240u16, 100u8, 50u8));
-        map.insert("YELLOW", (60u16, 100u8, 50u8));
-        map.insert("magenta", (300u16, 100u8, 50u8));
-        map.insert("CYAN", (180u16, 100u8, 50u8));
-        map.insert("white", (0u16, 0u8, 100u8));
+        map.insert("black", (0.0, 0.0, 0.0));
+        map.insert("RED", (0.0, 100.0, 50.0));
+        map.insert("GREEN", (120.0, 90.0, 50.0));
+        map.insert("BLUE", (240.0, 100.0, 50.0));
+        map.insert("YELLOW", (60.0, 100.0, 50.0));
+        map.insert("magenta", (300.0, 100.0, 50.0));
+        map.insert("CYAN", (180.0, 100.0, 50.0));
+        map.insert("white", (0.0, 0.0, 100.0));
 
         // println!("{:?}", map);
         for (key, value) in map {
