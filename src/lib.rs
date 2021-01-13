@@ -10,6 +10,7 @@ pub mod types;
 pub mod cards;
 pub mod projector;
 pub mod presets;
+mod fluo;
 
 #[cfg(test)]
 mod tests {

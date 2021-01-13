@@ -5,35 +5,35 @@ use crate::enums::Effect;
 use crate::types::{HEX, HSL, RGB};
 use crate::utils::ansi::{effect_to_ansi, L, R, SC};
 
-pub struct DyeFactory<T: ?Sized>
+pub struct DyeFactory<T> where
+    T: ?Sized
 {
     head: String,
     tail: String,
     ansi: fn(&T) -> String,
 }
 
-fn build_dye_factory<T: ?Sized>(color_to_ansi: fn(&T) -> String, effects: &[Effect]) -> DyeFactory<T> {
-    let mut dye = DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi: color_to_ansi };
-    (&mut dye).assign_effects(effects);
-    return dye;
+impl<T> DyeFactory<T> where T: ?Sized {
+    pub fn build(color_to_ansi: fn(&T) -> String, effects: &[Effect]) -> DyeFactory<T> {
+        let mut dye = DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi: color_to_ansi };
+        (&mut dye).assign_effects(effects);
+        return dye;
+    }
 }
 
 impl DyeFactory<RGB> {
-    pub fn rgb(effects: &[Effect]) -> Self {
-        build_dye_factory(rgb_ansi, effects)
-    }
+    pub fn rgb(effects: &[Effect]) -> Self
+    { DyeFactory::build(rgb_ansi, effects) }
 }
 
 impl DyeFactory<HSL> {
-    pub fn hsl(effects: &[Effect]) -> Self {
-        build_dye_factory(hsl_ansi, effects)
-    }
+    pub fn hsl(effects: &[Effect]) -> Self
+    { DyeFactory::build(hsl_ansi, effects) }
 }
 
 impl DyeFactory<HEX> {
-    pub fn hex(effects: &[Effect]) -> Self {
-        build_dye_factory(hex_ansi, effects)
-    }
+    pub fn hex(effects: &[Effect]) -> Self
+    { DyeFactory::build(hex_ansi, effects) }
 }
 
 impl<T: ?Sized> DyeFactory<T>
@@ -47,7 +47,7 @@ impl<T: ?Sized> DyeFactory<T>
         self
     }
 
-    pub fn make(&self, color: &T) -> impl Fn(&str) -> String + '_ {
+    pub fn make(&self, color: &T) -> impl Fn(&str) -> String + 'static {
         let ansi = (self.ansi)(color);
         let head = format!("{}{}{}{}{}", L, &self.head, SC, &ansi, R);
         let tail = format!("{}{}{}", L, &self.tail, R);
