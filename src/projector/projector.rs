@@ -2,6 +2,7 @@ use aryth::Bound;
 use num::Num;
 use num::traits::AsPrimitive;
 
+use crate::convert::hex_hsl;
 use crate::dye::DyeFactory;
 use crate::enums::Effect;
 use crate::projector::utils::{preset_to_leap, scale};
@@ -12,6 +13,7 @@ pub struct ProjectorFactory {
     pub lever: HSL,
     pub base: HSL,
     pub factory: DyeFactory<HSL>,
+    pub default: HSL,
 }
 
 impl ProjectorFactory {
@@ -37,23 +39,41 @@ impl ProjectorFactory {
             lever: div(&color_leap.dif, bound.dif().as_()),
             base: color_leap.min,
             factory: DyeFactory::hsl(effects),
+            default: hex_hsl(preset.na),
         };
     }
 
-    pub fn make<'a, T>(&self, value: T) -> impl Fn(&str) -> String + 'a
-        where T: Num + AsPrimitive<f32> + Copy
+    pub fn project<T>(&self, value: T) -> HSL where
+        T: Num + AsPrimitive<f32> + Copy
     {
+        let val = value.as_();
+        if f32::is_nan(val) { return self.default; }
         let floor = self.floor;
         let (lever_h, lever_s, lever_l) = self.lever;
         let (base_h, base_s, base_l) = self.base;
-        let hsl = (
-            scale(value.as_(), floor, lever_h, base_h, 360.0),
-            scale(value.as_(), floor, lever_s, base_s, 100.0),
-            scale(value.as_(), floor, lever_l, base_l, 100.0),
-        );
-        // println!("lever = {:?}, base = {:?}", self.lever, self.base);
-        return self.factory.make(&hsl);
+        (
+            scale(val, floor, lever_h, base_h, 360.0),
+            scale(val, floor, lever_s, base_s, 100.0),
+            scale(val, floor, lever_l, base_l, 100.0),
+        )
     }
+
+    pub fn render<T>(&self, value: T, text: &str) -> String
+        where T: Num + AsPrimitive<f32> + Copy
+    { self.factory.render(&self.project(value), text) }
+
+    pub fn make<T>(&self, value: T) -> impl Fn(&str) -> String
+        where T: Num + AsPrimitive<f32> + Copy
+    {
+        self.factory.make(&self.project(value))
+    }
+
+    pub fn make_box<'a, T>(&self, value: T) -> Box<dyn Fn(&str) -> String>
+        where T: Num + AsPrimitive<f32> + Copy
+    { Box::new(self.factory.make(&self.project(value))) }
+
+    pub fn make_default(&self) -> impl Fn(&str) -> String
+    { self.factory.make(&self.default) }
 }
 
 
@@ -65,7 +85,7 @@ mod projector_tests {
     use crate::projector::projector::ProjectorFactory;
 
     #[test]
-    fn test() {
+    fn test_make() {
         let bound = Bound { max: 5, min: 0 };
         let preset = FRESH;
         let effects = [];
@@ -73,6 +93,19 @@ mod projector_tests {
         for number in 0..5 {
             let dye = factory.make(number);
             println!("[{}]: {}", number, dye("some"));
+        }
+        // let preset=ATLAS;
+    }
+
+    #[test]
+    fn test_render() {
+        let bound = Bound::new(0, 5);
+        let preset = FRESH;
+        let effects = [];
+        let factory = ProjectorFactory::build(&bound, &preset, &effects);
+        for number in 0..5 {
+            let dyed = factory.render(number, "some");
+            println!("[{}]: {}", number, dyed);
         }
         // let preset=ATLAS;
     }

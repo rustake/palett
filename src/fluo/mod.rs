@@ -1,3 +1,3 @@
-pub use _fluo_vector::fluo_vector;
-
-mod _fluo_vector;
+pub mod vector;
+pub mod matrix;
+pub mod entries;

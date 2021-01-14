@@ -13,7 +13,9 @@ pub struct DyeFactory<T> where
     ansi: fn(&T) -> String,
 }
 
-impl<T> DyeFactory<T> where T: ?Sized {
+impl<T> DyeFactory<T> where
+    T: ?Sized
+{
     pub fn build(color_to_ansi: fn(&T) -> String, effects: &[Effect]) -> DyeFactory<T> {
         let mut dye = DyeFactory { head: "".to_owned(), tail: "".to_owned(), ansi: color_to_ansi };
         (&mut dye).assign_effects(effects);
@@ -36,6 +38,7 @@ impl DyeFactory<HEX> {
     { DyeFactory::build(hex_ansi, effects) }
 }
 
+
 impl<T: ?Sized> DyeFactory<T>
 {
     pub fn assign_effects(&mut self, effects: &[Effect]) -> &Self {
@@ -47,22 +50,28 @@ impl<T: ?Sized> DyeFactory<T>
         self
     }
 
-    pub fn make(&self, color: &T) -> impl Fn(&str) -> String + 'static {
+    pub fn toning(&self, color: &T) -> (String, String) {
         let ansi = (self.ansi)(color);
-        let head = format!("{}{}{}{}{}", L, &self.head, SC, &ansi, R);
-        let tail = format!("{}{}{}", L, &self.tail, R);
-        move |text| format!("{}{}{}", head, text, tail)
+        let head = format!("{}{}{}{}{}", L, self.head, SC, &ansi, R);
+        let tail = format!("{}{}{}", L, self.tail, R);
+        (head, tail)
     }
 
     pub fn render(&self, color: &T, text: &str) -> String {
-        let ansi = (self.ansi)(color);
-        format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text, L, &self.tail, R)
+        let (head, tail) = self.toning(color);
+        format!("{}{}{}", head, text, tail)
     }
 
-    // pub fn fission(&self, rgb: &RGB) -> Box<dyn Fn(&str) -> String + '_> {
-    //     let ansi = rgb_ansi(rgb);
-    //     Box::new(move |text| format!("{}{}{}{}{}{}{}{}{}", L, &self.head, SC, &ansi, R, text, L, &self.tail, R))
-    // }
+    pub fn make(&self, color: &T) -> impl Fn(&str) -> String
+    {
+        let (head, tail) = self.toning(color);
+        move |text| format!("{}{}{}", head, text, tail)
+    }
+
+    pub fn make_box(&self, color: &T) -> Box<dyn Fn(&str) -> String> {
+        let (head, tail) = self.toning(color);
+        Box::new(move |text| format!("{}{}{}", head, text, tail))
+    }
 }
 
 // impl<T> Fn<(T, )> for DyeFactory<T> {
@@ -83,7 +92,20 @@ impl<T: ?Sized> DyeFactory<T>
 //     extern "rust-call" fn call_once(self, args: (T, )) -> fn(&str) -> String {
 //         self.call(args)
 //     }
-//     // impl Fn(&str) -> String + '_
+//     // Dye + '_
+// }
+
+// pub trait Factory<'a, T, F> where F: Fn(&str) -> String + 'a {
+//     fn make(&self, value: &T) -> F;
+// }
+//
+// impl<'a, T, F> Factory<'a, T, F> for DyeFactory<T> where F: Fn(&str) -> String + 'a {
+//     fn make(&self, value: &T) -> F {
+//         let ansi = (self.ansi)(value);
+//         let head = format!("{}{}{}{}{}", L, &self.head, SC, &ansi, R);
+//         let tail = format!("{}{}{}", L, &self.tail, R);
+//         move |text| format!("{}{}{}", head, text, tail)
+//     }
 // }
 
 #[cfg(test)]

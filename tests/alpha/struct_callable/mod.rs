@@ -1,1 +1,2 @@
 mod struct_callable_alpha;
+mod return_closure_test;
