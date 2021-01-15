@@ -15,14 +15,14 @@ pub fn fluo_rendered<M, R>(
     presets: &(Preset, Preset),
     effects: &[Effect],
 ) -> Matrix<String> where
-    M: IntoIterator<Item=R> + Copy,
-    R: IntoIterator + Copy,
+    M: IntoIterator<Item=R>,
+    R: IntoIterator,
     R::Item: fmt::Display
 {
-    let mx_v: Matrix<String> = matrix.mapper(|el| el.to_string());
+    let mx: Matrix<String> = matrix.mapper(|el| el.to_string());
     let ((mx_x, dye_fac_x),
-        (mx_y, dye_fac_y)) = make_projector(matrix, presets, effects);
-    trizipper(mx_x, mx_y, mx_v, |x, y, tx| {
+        (mx_y, dye_fac_y)) = make_projector(&mx, presets, effects);
+    trizipper(mx_x, mx_y, mx, |x, y, tx| {
         if let Some(v) = x { return dye_fac_x.render(v, &tx); }
         if let Some(v) = y { return dye_fac_y.render(v, &tx); }
         return dye_fac_x.render(f32::nan(), &tx);
@@ -34,8 +34,8 @@ pub fn fluo_colorant<M, R>(
     presets: &(Preset, Preset),
     effects: &[Effect],
 ) -> Matrix<impl Fn(&str) -> String> where
-    M: IntoIterator<Item=R> + Copy,
-    R: IntoIterator + Copy,
+    M: IntoIterator<Item=R>,
+    R: IntoIterator,
     R::Item: fmt::Display
 {
     let ((vec_x, dye_fac_x),
@@ -52,8 +52,8 @@ fn make_projector<M, R>(
     presets: &(Preset, Preset),
     effects: &[Effect],
 ) -> ((Matrix<Option<f32>>, ProjectorFactory), (Matrix<Option<f32>>, ProjectorFactory)) where
-    M: IntoIterator<Item=R> + Copy,
-    R: IntoIterator + Copy,
+    M: IntoIterator<Item=R>,
+    R: IntoIterator,
     R::Item: fmt::Display
 {
     let (pre_x, pre_y) = presets;

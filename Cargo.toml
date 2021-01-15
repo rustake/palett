@@ -1,7 +1,7 @@
 [package]
 name = "palett"
 description = "ansi color space tool"
-version = "0.0.3"
+version = "0.0.4"
 authors = ["hazen <hoyeungw@outlook.com>"]
 readme = "README.md"
 license = "MIT"

@@ -12,11 +12,3 @@ pub mod cards;
 pub mod projector;
 pub mod presets;
 pub mod fluo;
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}

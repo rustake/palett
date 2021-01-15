@@ -1,4 +1,4 @@
-fn max<T: PartialOrd + Copy>(list: &[T]) -> T {
+fn max<T: PartialOrd +Copy>(list: &[T]) -> T {
     let mut max = list[0];
     for &item in list { if item > max { max = item; } }
     max

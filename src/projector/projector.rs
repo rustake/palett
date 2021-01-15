@@ -22,7 +22,7 @@ impl ProjectorFactory {
         preset: &Preset,
         effects: &[Effect],
     ) -> Option<ProjectorFactory>
-        where T: Num + AsPrimitive<f32> + Copy
+        where T: Num + AsPrimitive<f32>
     {
         match bound {
             None => { None }
@@ -30,7 +30,7 @@ impl ProjectorFactory {
         }
     }
     pub fn build<T>(bound: &Bound<T>, preset: &Preset, effects: &[Effect]) -> ProjectorFactory
-        where T: Num + AsPrimitive<f32> + Copy
+        where T: Num + AsPrimitive<f32>
     {
         let color_leap = preset_to_leap(preset);
         // println!("max = {:?}, min = {:?}, dif = {:?}", color_leap.max, color_leap.min, color_leap.dif);
@@ -44,7 +44,7 @@ impl ProjectorFactory {
     }
 
     pub fn project<T>(&self, value: T) -> HSL where
-        T: Num + AsPrimitive<f32> + Copy
+        T: Num + AsPrimitive<f32>
     {
         let val = value.as_();
         if f32::is_nan(val) { return self.default; }
@@ -59,17 +59,17 @@ impl ProjectorFactory {
     }
 
     pub fn render<T>(&self, value: T, text: &str) -> String
-        where T: Num + AsPrimitive<f32> + Copy
+        where T: Num + AsPrimitive<f32>
     { self.factory.render(&self.project(value), text) }
 
     pub fn make<T>(&self, value: T) -> impl Fn(&str) -> String
-        where T: Num + AsPrimitive<f32> + Copy
+        where T: Num + AsPrimitive<f32>
     {
         self.factory.make(&self.project(value))
     }
 
     pub fn make_box<'a, T>(&self, value: T) -> Box<dyn Fn(&str) -> String>
-        where T: Num + AsPrimitive<f32> + Copy
+        where T: Num + AsPrimitive<f32>
     { Box::new(self.factory.make(&self.project(value))) }
 
     pub fn make_default(&self) -> impl Fn(&str) -> String
