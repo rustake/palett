@@ -1,7 +1,6 @@
 pub use bound::Bound;
 pub use card::Card;
 pub use color_bound::ColorBound;
-pub use dye::{create_dye, Dye};
 pub use extensions::div;
 pub use leap::Leap;
 pub use preset::Preset;
@@ -12,7 +11,6 @@ mod leap;
 mod bound;
 mod color_bound;
 mod extensions;
-mod dye;
 
 pub type RGB = (u8, u8, u8);
 pub type HSL = (f32, f32, f32);

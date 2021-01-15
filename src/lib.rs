@@ -1,7 +1,7 @@
 // #![feature(unboxed_closures)]
 // #![feature(fn_traits)]
-#![feature(trait_alias)]
-#![feature(type_alias_impl_trait)]
+// #![feature(trait_alias)]
+// #![feature(type_alias_impl_trait)]
 
 pub mod convert;
 pub mod dye;

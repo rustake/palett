@@ -3,7 +3,7 @@ use std::fmt;
 use aryth::Bound;
 use aryth::duobound::vector::duobound;
 use num::Float;
-use veho::vector::Mappers;
+use veho::vector::{Mappers, trizipper, zipper};
 
 use crate::enums::Effect;
 use crate::projector::ProjectorFactory;
@@ -14,31 +14,37 @@ pub fn fluo_rendered<I>(
     presets: &(Preset, Preset),
     effects: &[Effect],
 ) -> Vec<String> where
-    I: IntoIterator + Copy,
+    I: IntoIterator,
     I::Item: fmt::Display
 {
-    let (
-        (vec_x, dye_fac_x),
-        (vec_y, dye_fac_y)
-    ) = make_projector(vec, presets, effects);
-    let projector = to_rendered(&vec_x, &dye_fac_x, &vec_y, &dye_fac_y);
-    vec.indexed_mapper(|i, x| projector(i, &x.to_string()))
+    let texts: Vec<String> = vec.mapper(|x| { x.to_string() });
+    let ((vec_x, fac_x),
+        (vec_y, fac_y)) = make_projector(&texts, presets, effects);
+    trizipper(vec_x, vec_y, texts, |x, y, tx| {
+        if let Some(v) = x { return fac_x.render(v, &tx); }
+        if let Some(v) = y { return fac_y.render(v, &tx); }
+        return fac_x.render(f32::nan(), &tx);
+    })
 }
 
 pub fn fluo_colorant<I>(
     vec: I,
     presets: &(Preset, Preset),
     effects: &[Effect],
-) -> Vec<Dye> where
-    I: IntoIterator + Copy,
-    I::Item: fmt::Display
+) -> Vec<impl Fn(&str) -> String> where
+    I: IntoIterator,
+    I::Item: fmt::Display,
 {
+    let texts: Vec<String> = vec.mapper(|x| { x.to_string() });
     let (
         (vec_x, dye_fac_x),
         (vec_y, dye_fac_y)
-    ) = make_projector(vec, presets, effects);
-    let projector = to_colorant(&vec_x, &dye_fac_x, &vec_y, &dye_fac_y);
-    vec.indexed_mapper(|i, x| projector(i, &x))
+    ) = make_projector(&texts, presets, effects);
+    zipper(vec_x, vec_y, |x, y| {
+        if let Some(v) = x { return dye_fac_x.make(v); }
+        if let Some(v) = y { return dye_fac_y.make(v); }
+        return dye_fac_x.make(f32::nan());
+    })
 }
 
 fn make_projector<I>(
@@ -62,37 +68,6 @@ fn make_projector<I>(
         ProjectorFactory::build(&bound_y, &pre_y, effects)
     );
     return ((vec_x, dye_fac_x), (vec_y, dye_fac_y));
-}
-
-fn to_rendered<'a>(
-    vec_x: &'a Vec<Option<f32>>,
-    dye_fac_x: &'a ProjectorFactory,
-    vec_y: &'a Vec<Option<f32>>,
-    dye_fac_y: &'a ProjectorFactory,
-) -> impl Fn(usize, &str) -> String + 'a
-{
-    move |i, tx| {
-        if let Some(v) = vec_x[i] { return dye_fac_x.render(v, tx); }
-        if let Some(v) = vec_y[i] { return dye_fac_y.render(v, tx); }
-        return dye_fac_x.render(f32::nan(), tx);
-    }
-}
-
-pub type Dye = impl Fn(&str) -> String;
-
-fn to_colorant<'a, T>(
-    vec_x: &'a Vec<Option<f32>>,
-    dye_fac_x: &'a ProjectorFactory,
-    vec_y: &'a Vec<Option<f32>>,
-    dye_fac_y: &'a ProjectorFactory,
-) -> impl Fn(usize, &T) -> Dye + 'a
-    where T: fmt::Display
-{
-    move |i, _| {
-        if let Some(v) = vec_x[i] { return dye_fac_x.make(v); }
-        if let Some(v) = vec_y[i] { return dye_fac_y.make(v); }
-        return dye_fac_x.make(f32::nan());
-    }
 }
 
 
@@ -128,27 +103,6 @@ mod tests {
             vec!["1", "2", "3", "foo", "bar", "zen"],
             vec!["1", "2", "3", ],
             vec!["foo", "bar", "zen"]
-        ];
-        for vec in &candidates {
-            let fluoed = fluo_colorant(
-                vec,
-                &(OCEAN, FRESH),
-                &[Effect::Bold],
-            );
-            let results = zipper(vec, fluoed, |x, f| {
-                f(x)
-            });
-            let tx = results.join(", ");
-            println!("[ {} ]", tx);
-        }
-    }
-
-    #[test]
-    fn test_fluo_vector_colorant2() {
-        let candidates = vec![
-            ["1", "2", "3", "foo", "bar", "zen"],
-            ["1", "2", "3", "4", "5", "6"],
-            ["foo", "bar", "zen", "-", "--", "---"]
         ];
         for vec in &candidates {
             let fluoed = fluo_colorant(
