@@ -1,8 +1,8 @@
 [package]
 name = "palett"
 description = "ansi color space tool"
-version = "0.0.4"
-authors = ["hazen <hoyeungw@outlook.com>"]
+version = "0.0.5"
+authors = ["Hoyeung Wong <hoyeungw@outlook.com>"]
 readme = "README.md"
 license = "MIT"
 edition = "2018"
@@ -11,5 +11,5 @@ edition = "2018"
 
 [dependencies]
 num = ">=0.3.1"
-veho = ">=0.0.9"
+veho = ">=0.0.15"
 aryth = ">=0.0.7"

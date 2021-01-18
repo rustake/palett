@@ -17,7 +17,7 @@ pub fn fluo_rendered<I>(
     I: IntoIterator,
     I::Item: fmt::Display
 {
-    let texts: Vec<String> = vec.mapper(|x| { x.to_string() });
+    let texts: Vec<String> = vec.mapper(|x| x.to_string());
     let ((vec_x, fac_x),
         (vec_y, fac_y)) = make_projector(&texts, presets, effects);
     trizipper(vec_x, vec_y, texts, |x, y, tx| {
