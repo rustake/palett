@@ -1,7 +1,7 @@
 use std::fmt::Write;
 
 use crate::convert::{hex_int, hsl_rgb};
-use crate::types::{HEX, HSL, RGB};
+use crate::types::{HSL, RGB};
 use crate::utils::ansi::{FORE, SC};
 
 pub fn rgb_ansi(rgb: &RGB) -> String {
@@ -12,7 +12,7 @@ pub fn rgb_ansi(rgb: &RGB) -> String {
 }
 
 
-pub fn hex_ansi(hex_color: &HEX) -> String {
+pub fn hex_ansi(hex_color: &str) -> String {
     let n = hex_int(hex_color);
     let mut text = FORE.to_owned();
     write!(&mut text, "{}{}{}{}{}{}", SC, n >> 16 & 0xFF, SC, n >> 8 & 0xFF, SC, n & 0xFF).unwrap();

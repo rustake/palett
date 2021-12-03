@@ -1,6 +1,4 @@
-use crate::types::{HEX, INT};
-
-pub fn hex_int(hex: &HEX) -> INT {
+pub fn hex_int(hex: &str) -> u32 {
     let hex = hex.trim_start_matches('#');
     return match u32::from_str_radix(hex, 16) {
         Ok(v) => v,
@@ -11,6 +9,7 @@ pub fn hex_int(hex: &HEX) -> INT {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+
     use crate::convert::_hex_int::hex_int;
 
     #[test]

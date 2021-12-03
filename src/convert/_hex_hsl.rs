@@ -1,14 +1,15 @@
-use crate::convert::_rgb_hsl::rgb_hsl;
 use crate::convert::_hex_rgb::hex_rgb;
-use crate::types::{HSL, HEX};
+use crate::convert::_rgb_hsl::rgb_hsl;
+use crate::types::HSL;
 
-pub fn hex_hsl(hex: &HEX) -> HSL {
+pub fn hex_hsl(hex: &str) -> HSL {
     return rgb_hsl(&hex_rgb(hex));
 }
 
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+
     use crate::convert::_hex_hsl::hex_hsl;
 
     #[test]

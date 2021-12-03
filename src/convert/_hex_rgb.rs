@@ -1,7 +1,7 @@
 use crate::convert::_hex_int::hex_int;
-use crate::types::{HEX, RGB};
+use crate::types::RGB;
 
-pub fn hex_rgb(hex: &HEX) -> RGB {
+pub fn hex_rgb(hex: &str) -> RGB {
     let int = hex_int(hex);
     return ((int >> 16 & 0xFF) as u8, (int >> 8 & 0xFF) as u8, (int & 0xFF) as u8);
 }
@@ -9,6 +9,7 @@ pub fn hex_rgb(hex: &HEX) -> RGB {
 #[cfg(test)]
 mod tests {
     use std::collections::HashMap;
+
     use crate::convert::_hex_rgb::hex_rgb;
 
     #[test]

@@ -12,3 +12,4 @@ pub mod cards;
 pub mod projector;
 pub mod presets;
 pub mod fluo;
+pub mod deco;

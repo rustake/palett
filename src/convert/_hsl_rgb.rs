@@ -29,14 +29,14 @@ mod tests {
     fn test_hsl_to_rgb() {
         // let mut book_reviews = HashMap::new();
         let mut map = HashMap::new();
-        map.insert("black", (0.0, 0.0, 0.0));
+        map.insert("BLACK", (0.0, 0.0, 0.0));
         map.insert("RED", (0.0, 100.0, 50.0));
         map.insert("GREEN", (120.0, 90.0, 50.0));
         map.insert("BLUE", (240.0, 100.0, 50.0));
         map.insert("YELLOW", (60.0, 100.0, 50.0));
-        map.insert("magenta", (300.0, 100.0, 50.0));
+        map.insert("MAGENTA", (300.0, 100.0, 50.0));
         map.insert("CYAN", (180.0, 100.0, 50.0));
-        map.insert("white", (0.0, 0.0, 100.0));
+        map.insert("WHITE", (0.0, 0.0, 100.0));
 
         // println!("{:?}", map);
         for (key, value) in map {
